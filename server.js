@@ -228,7 +228,7 @@ const personRoutes=require('./routes/personRoutes');
 const menuRoutes=require('./routes/menuItemsRoutes')
 app.use('/person',personRoutes);
 app.use('/menuItems',menuRoutes);
-
+//comment added
 app.listen(3000, () => {
   console.log("server is running on port 3000");
 });
