@@ -188,12 +188,15 @@
 const express = require("express");
 const app = express();
 const db = require("./db");
-require('dotenv').config();
-
+require("dotenv").config();
+const passport=require('./auth');
 const menuItems = require("./models/MenuItems");
 const bodyParser = require("body-parser");
 const MenuItems = require("./models/MenuItems");
 app.use(bodyParser.json());
+const personRoutes = require("./routes/personRoutes");
+const menuRoutes = require("./routes/menuItemsRoutes");
+const person = require("./models/person");
 
 ///get
 // app.get('/',function(req,res){
@@ -225,14 +228,41 @@ app.use(bodyParser.json());
 
 
 
-const personRoutes=require('./routes/personRoutes');
-const menuRoutes=require('./routes/menuItemsRoutes')
-app.use('/person',personRoutes);
-app.use('/menuItems',menuRoutes);
 //comment added
 
+////registerlog
+//middleware function
+const logRequest = (req, res, next) => {
+  console.log(
+    `[${new Date().toLocaleString()}]Request Made to : ${req.originalUrl}`
+  );
+  next();
+};
 
-const PORT =process.env.PORT || 3000;
+// app.get('/',logRequest,(req,res)=>{
+//   //res.send("Welcome to my hotel");
+//   res.send(`${new Date().toLocaleString()}Request Made to : ${req.originalUrl}`)
+// })
+app.use(logRequest);
+
+/////auth middeleware
+
+
+/////passport.js
+
+app.use(passport.initialize());
+const localAuthMiddleware=passport.authenticate('local',{session:false});
+////
+app.get("/",localAuthMiddleware ,(req, res) => {
+  //res.send("Welcome to my hotel");
+  res.send(
+    `${new Date().toLocaleString()}Request Made to : ${req.originalUrl}`
+  );
+});
+app.use("/person", personRoutes);
+app.use("/menuItems", menuRoutes);
+///////////////
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("server is running on port 3000");
 });
